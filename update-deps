@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e -x
+
+export GOPATH=$PWD
+
+deps=$PWD/deps.txt
+
+rm -f $deps
+
+# Remove all deps
+find -f src/* -maxdepth 3 -type d | grep -v '^src/github.com\(/voelzmo\(/bosh-director-info.*\)*\)*$' | xargs rm -rf
+
+go get -d -t -v github.com/voelzmo/bosh-director-info/...
+
+# todo why does -t flag dont work?
+go get github.com/onsi/ginkgo/ginkgo
+go get github.com/onsi/gomega
+go get github.com/kisielk/errcheck
+
+# Remove all .git folders
+dirs=$(find * -type d -name '.git')
+
+for dir in $dirs; do
+  # Capture deps info
+  echo "$(cd $dir/.. && git rev-parse --short HEAD) $dir" >> $deps
+
+  # Remove .git directory
+  rm -rf $dir
+done
