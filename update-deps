@@ -15,11 +15,6 @@ find -f src/* -maxdepth 3 -type d \
 
 go get -d -t -v github.com/voelzmo/bosh-director-info/...
 
-# todo why does -t flag dont work?
-go get github.com/onsi/ginkgo/ginkgo
-go get github.com/onsi/gomega
-go get github.com/kisielk/errcheck
-
 # Remove all .git folders
 dirs=$(find * -type d -name '.git')
 

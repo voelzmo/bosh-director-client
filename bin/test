@@ -13,6 +13,7 @@ for i in `ls -1 src/github.com/voelzmo/bosh-director-info/` ; do
 done
 let "result+=$?"
 
+go get github.com/kisielk/errcheck
 echo -e "\n Looking for unchecked errors..."
 errcheck -blank -ignoretests -verbose github.com/voelzmo/bosh-director-info/...
 let "result+=$?"
