@@ -14,6 +14,7 @@ find -f src/* -maxdepth 3 -type d \
 | xargs rm -rf
 
 go get -d -t -v github.com/voelzmo/bosh-director-info/...
+go get github.com/kisielk/errcheck
 
 # Remove all .git folders
 dirs=$(find * -type d -name '.git')

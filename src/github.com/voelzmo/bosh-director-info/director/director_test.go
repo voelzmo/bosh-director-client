@@ -12,10 +12,12 @@ var _ = Describe("Director", func() {
 	Context("When initialized with a target", func() {
 
 		BeforeEach(func() {
-			dir = director.NewDirector("bla")
+			dir = director.NewDirector("https://52.2.165.66:25555")
 		})
+
 		It("Contacts the target on #status", func() {
-			Expect(dir.Status()).To(Equal("bla"))
+			status := dir.Status()
+			Expect(status.Name).To(Equal("my-bosh"))
 		})
 	})
 })
