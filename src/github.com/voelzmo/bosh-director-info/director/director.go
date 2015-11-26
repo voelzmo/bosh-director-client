@@ -1,6 +1,7 @@
 package director
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,15 +13,18 @@ import (
 
 type Director interface {
 	Status() api.Status
+	Login() api.Login
 }
 
 type director struct {
-	target     string
-	rootCAPath string
+	target       string
+	rootCAPath   string
+	clientName   string
+	clientSecret string
 }
 
-func NewDirector(target string, rootCAPath string) Director {
-	return &director{target, rootCAPath}
+func NewDirector(target string, rootCAPath string, clientName string, clientSecret string) Director {
+	return &director{target, rootCAPath, clientName, clientSecret}
 }
 
 func (d *director) Status() api.Status {
@@ -40,19 +44,29 @@ func (d *director) Status() api.Status {
 	return status
 }
 
-func (d *director) Login() bool {
+func (d *director) Login() api.Login {
+	var auth api.Login
+
 	directorStatus := d.Status()
 	authURL := directorStatus.UserAuthentication.Options["url"]
 
-	client := &http.Client{}
+	client := NewClient(d.rootCAPath)
 
-	req, _ := http.NewRequest("POST", authURL, nil)
-	// ...
+	postBody := bytes.NewReader([]byte(`grant_type=client_credentials`))
+	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/oauth/token", authURL), postBody)
 	req.Header.Add("content-type", "application/x-www-form-urlencoded;charset=utf-8")
 	req.Header.Add("accept", "application/json;charset=utf-8")
-	resp, _ := client.Do(req)
+	req.SetBasicAuth(d.clientName, d.clientSecret)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal("Error logging in: %s", err)
+	}
+	defer resp.Body.Close()
 
-	return true
+	body, _ := ioutil.ReadAll(resp.Body)
+	json.Unmarshal(body, &auth)
+
+	return auth
 }
 
 //
