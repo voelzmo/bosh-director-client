@@ -14,6 +14,7 @@ import (
 type Director interface {
 	Status() api.Status
 	Login() api.Login
+	Deployments() []api.Deployment
 }
 
 type director struct {
@@ -67,6 +68,26 @@ func (d *director) Login() api.Login {
 	json.Unmarshal(body, &auth)
 
 	return auth
+}
+
+func (d *director) Deployments() []api.Deployment {
+	var deployments []api.Deployment
+
+	login := d.Login()
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s/deployments", d.target), nil)
+	req.Header.Add("Authorization", fmt.Sprintf("%s %s", login.TokenType, login.AccessToken))
+
+	directorClient := NewClient(d.rootCAPath)
+	resp, err := directorClient.Do(req)
+	if err != nil {
+		log.Fatal("Error getting director deployments: %s", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	json.Unmarshal(body, &deployments)
+
+	return deployments
 }
 
 //
