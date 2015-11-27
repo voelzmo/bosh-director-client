@@ -1,12 +1,8 @@
 package director
 
 import (
-	"bytes"
-	"encoding/json"
+	"encoding/base64"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
 
 	"github.com/voelzmo/bosh-director-client/api"
 )
@@ -31,61 +27,35 @@ func NewDirector(target string, rootCAPath string, clientName string, clientSecr
 func (d *director) Status() api.Status {
 	var status api.Status
 
-	directorClient := NewClient(d.rootCAPath)
-
-	resp, err := directorClient.Get(fmt.Sprintf("%s/info", d.target))
-	if err != nil {
-		log.Fatal("Error getting director status: %s", err)
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	json.Unmarshal(body, &status)
+	auth := "" // info endpoint doesn't need authorization
+	GetClient(d.target, d.rootCAPath, auth).RequestAndParseJSON("GET", "/info", make(map[string]string), nil, &status)
 
 	return status
 }
 
 func (d *director) Login() api.Login {
-	var auth api.Login
+	var login api.Login
 
 	directorStatus := d.Status()
 	authURL := directorStatus.UserAuthentication.Options["url"]
 
-	client := NewClient(d.rootCAPath)
+	postBody := []byte(`grant_type=client_credentials`)
 
-	postBody := bytes.NewReader([]byte(`grant_type=client_credentials`))
-	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/oauth/token", authURL), postBody)
-	req.Header.Add("content-type", "application/x-www-form-urlencoded;charset=utf-8")
-	req.Header.Add("accept", "application/json;charset=utf-8")
-	req.SetBasicAuth(d.clientName, d.clientSecret)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error logging in: %s", err)
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	json.Unmarshal(body, &auth)
-
-	return auth
+	userPassword := []byte(fmt.Sprintf("%s:%s", d.clientName, d.clientSecret))
+	auth := "Basic " + base64.StdEncoding.EncodeToString(userPassword)
+	headers := make(map[string]string)
+	headers["content-type"] = "application/x-www-form-urlencoded;charset=utf-8"
+	headers["accept"] = "application/json;charset=utf-8"
+	GetClient(authURL, d.rootCAPath, auth).RequestAndParseJSON("POST", "/oauth/token", headers, postBody, &login)
+	return login
 }
 
 func (d *director) Deployments() []api.Deployment {
 	var deployments []api.Deployment
 
 	login := d.Login()
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s/deployments", d.target), nil)
-	req.Header.Add("Authorization", fmt.Sprintf("%s %s", login.TokenType, login.AccessToken))
-
-	directorClient := NewClient(d.rootCAPath)
-	resp, err := directorClient.Do(req)
-	if err != nil {
-		log.Fatal("Error getting director deployments: %s", err)
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	json.Unmarshal(body, &deployments)
+	auth := fmt.Sprintf("%s %s", login.TokenType, login.AccessToken)
+	GetClient(d.target, d.rootCAPath, auth).RequestAndParseJSON("GET", "/deployments", make(map[string]string), nil, &deployments)
 
 	return deployments
 }
