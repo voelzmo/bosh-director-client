@@ -1,6 +1,8 @@
 package director_test
 
 import (
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/voelzmo/bosh-director-client/director"
@@ -12,7 +14,11 @@ var _ = Describe("Director", func() {
 	Context("When initialized with a target", func() {
 
 		BeforeEach(func() {
-			dir = director.NewDirector("https://52.2.165.66:25555")
+			target := os.Getenv("BDC_ITEST_TARGET")
+			rootCAPath := os.Getenv("BDC_ITEST_ROOT_CA_PATH")
+			clientName := os.Getenv("BDC_ITEST_CLIENT_NAME")
+			clientSecret := os.Getenv("BDC_ITEST_CLIENT_SECRET")
+			dir = director.NewDirector(target, rootCAPath, clientName, clientSecret)
 		})
 
 		It("Contacts the target on #status", func() {

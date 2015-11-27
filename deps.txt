@@ -1,5 +1,5 @@
 12fd1ab src/github.com/kisielk/errcheck/.git
 58a7a19 src/github.com/kisielk/gotool/.git
-39d2c24 src/github.com/onsi/ginkgo/.git
+a06d064 src/github.com/onsi/ginkgo/.git
 2152b45 src/github.com/onsi/gomega/.git
 fff8fd7 src/golang.org/x/tools/.git
