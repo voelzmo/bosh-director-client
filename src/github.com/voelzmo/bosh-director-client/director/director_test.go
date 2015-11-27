@@ -3,7 +3,7 @@ package director_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/voelzmo/bosh-director-info/director"
+	"github.com/voelzmo/bosh-director-client/director"
 )
 
 var dir director.Director

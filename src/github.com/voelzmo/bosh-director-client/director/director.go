@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/voelzmo/bosh-director-info/api"
+	"github.com/voelzmo/bosh-director-client/api"
 )
 
 type Director interface {

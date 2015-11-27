@@ -6,23 +6,23 @@ echo '  % ginkgo path/to/package'
 result=0
 
 echo -e "\n Formatting packages..."
-for i in `ls -1 src/github.com/voelzmo/bosh-director-info/` ; do
+for i in `ls -1 src/github.com/voelzmo/bosh-director-client/` ; do
   if [ -d "$i" ] ; then
-    go fmt github.com/voelzmo/bosh-director-info/${i}/... 2> /dev/null
+    go fmt github.com/voelzmo/bosh-director-client/${i}/... 2> /dev/null
   fi
 done
 let "result+=$?"
 
 echo -e "\n Looking for unchecked errors..."
-errcheck -blank -ignoretests -verbose github.com/voelzmo/bosh-director-info/...
+errcheck -blank -ignoretests -verbose github.com/voelzmo/bosh-director-client/...
 let "result+=$?"
 
 echo -e "\n Vetting packages for potential issues..."
-go vet github.com/voelzmo/bosh-director-info/...
+go vet github.com/voelzmo/bosh-director-client/...
 let "result+=$?"
 
 echo -e "\n Testing packages..."
-ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --trace --race --progress src/github.com/voelzmo/bosh-director-info/
+ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --trace --race --progress src/github.com/voelzmo/bosh-director-client/
 let "result+=$?"
 
 if [ $result -eq 0 ]; then
