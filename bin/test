@@ -22,7 +22,7 @@ go vet github.com/voelzmo/bosh-director-client/...
 let "result+=$?"
 
 echo -e "\n Testing packages..."
-ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --trace --race --progress src/github.com/voelzmo/bosh-director-client/
+ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --trace --race --progress --skip=vendor .
 let "result+=$?"
 
 if [ $result -eq 0 ]; then
