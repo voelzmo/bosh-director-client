@@ -6,19 +6,15 @@ echo '  % ginkgo path/to/package'
 result=0
 
 echo -e "\n Formatting packages..."
-for i in `ls -1 src/github.com/voelzmo/bosh-director-client/` ; do
-  if [ -d "$i" ] ; then
-    go fmt github.com/voelzmo/bosh-director-client/${i}/... 2> /dev/null
-  fi
-done
+go fmt $(go list ./... | grep -v /vendor/) 2> /dev/null
 let "result+=$?"
 
 echo -e "\n Looking for unchecked errors..."
-errcheck -blank -ignoretests -verbose github.com/voelzmo/bosh-director-client/...
+errcheck -blank -ignoretests -verbose $(go list ./... | grep -v /vendor/)
 let "result+=$?"
 
 echo -e "\n Vetting packages for potential issues..."
-go vet github.com/voelzmo/bosh-director-client/...
+go vet $(go list ./... | grep -v /vendor/)
 let "result+=$?"
 
 echo -e "\n Testing packages..."
