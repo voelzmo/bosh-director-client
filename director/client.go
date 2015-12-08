@@ -55,7 +55,7 @@ func (c *authorizingClient) RequestAndParseJSON(method string, path string, head
 	directorClient := NewClient(c.rootCAPath)
 	resp, err := directorClient.Do(req)
 	if err != nil {
-		log.Fatal("Error getting director deployments: %s", err)
+		log.Fatalf("Error contacting director: %s", err)
 	}
 	defer resp.Body.Close()
 

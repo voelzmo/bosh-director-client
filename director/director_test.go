@@ -37,5 +37,12 @@ var _ = Describe("Director", func() {
 			Expect(deployments).NotTo(BeEmpty())
 			Expect(deployments[0].Name).To(Equal("test"))
 		})
+
+		It("#tasks returns a list of tasks with some IDs and state", func() {
+			tasks := dir.Tasks()
+			Expect(tasks).NotTo(BeEmpty())
+			Expect(tasks[len(tasks)-1].ID).To(Equal(1))
+		})
+
 	})
 })

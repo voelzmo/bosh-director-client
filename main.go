@@ -22,13 +22,18 @@ func main() {
 		log.Fatal(err)
 	}
 	director := director.NewDirector(args.Target, args.RootCAPath, args.ClientName, args.ClientSecret)
-	prettyStatus, _ := json.MarshalIndent(director.Status(), "", "  ")
 
+	prettyStatus, _ := json.MarshalIndent(director.Status(), "", "  ")
 	fmt.Printf("The director status: '%s'\n", prettyStatus)
 
 	prettyLogin, _ := json.MarshalIndent(director.Login(), "", "  ")
-
 	fmt.Printf("The director login: '%s'\n", prettyLogin)
+
+	prettyDeployments, _ := json.MarshalIndent(director.Deployments(), "", "  ")
+	fmt.Printf("The director deployments: '%s'\n", prettyDeployments)
+
+	prettyTasks, _ := json.MarshalIndent(director.Tasks(), "", "  ")
+	fmt.Printf("The director tasks: '%s'\n", prettyTasks)
 
 }
 
