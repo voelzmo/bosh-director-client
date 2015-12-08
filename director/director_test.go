@@ -44,5 +44,11 @@ var _ = Describe("Director", func() {
 			Expect(tasks[len(tasks)-1].ID).To(Equal(1))
 		})
 
+		It("#taskDetails returns debug output for a task", func() {
+			taskDetails := dir.TaskDetails(1, "debug")
+			Expect(taskDetails).NotTo(BeEmpty())
+			Expect(taskDetails).To(ContainSubstring("INFO -- TaskHelper: Enqueuing task: 1"))
+		})
+
 	})
 })

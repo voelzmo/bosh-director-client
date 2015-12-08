@@ -12,6 +12,7 @@ type Director interface {
 	Login() api.Login
 	Deployments() []api.Deployment
 	Tasks() []api.Task
+	TaskDetails(id int, outputType string) string
 }
 
 type director struct {
@@ -69,4 +70,15 @@ func (d *director) Tasks() []api.Task {
 	GetClient(d.target, d.rootCAPath, auth).RequestAndParseJSON("GET", "/tasks", make(map[string]string), nil, &tasks)
 
 	return tasks
+}
+
+func (d *director) TaskDetails(id int, outputType string) string {
+	var taskDetails string
+
+	login := d.Login()
+	auth := fmt.Sprintf("%s %s", login.TokenType, login.AccessToken)
+	path := fmt.Sprintf("/tasks/%v/output?type=%s", id, outputType)
+	taskDetails, _ = GetClient(d.target, d.rootCAPath, auth).RequestAndParseString("GET", path, make(map[string]string), nil)
+
+	return taskDetails
 }
